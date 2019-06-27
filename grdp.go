@@ -9,6 +9,7 @@ import (
 	"github.com/18121861183/grdp/protocol/pdu"
 	"github.com/18121861183/grdp/protocol/sec"
 	"github.com/18121861183/grdp/protocol/t125"
+	"github.com/18121861183/grdp/protocol/t125/gcc"
 	"github.com/18121861183/grdp/protocol/tpkt"
 	"github.com/18121861183/grdp/protocol/x224"
 	"log"
@@ -20,12 +21,13 @@ import (
 )
 
 type Client struct {
-	Host string // ip:port
-	tpkt *tpkt.TPKT
-	x224 *x224.X224
-	mcs  *t125.MCSClient
-	Sec  *sec.Client
-	pdu  *pdu.Client
+	Host       string // ip:port
+	tpkt       *tpkt.TPKT
+	x224       *x224.X224
+	mcs        *t125.MCSClient
+	Sec        *sec.Client
+	pdu        *pdu.Client
+	ClientInfo *gcc.ClientCoreData
 }
 
 func NewClient(host string, logLevel glog.LEVEL) *Client {
@@ -48,7 +50,7 @@ func (g *Client) Login(user, pwd string) error {
 
 	g.tpkt = tpkt.New(core.NewSocketLayer(conn, nla.NewNTLMv2(domain, user, pwd)))
 	g.x224 = x224.New(g.tpkt)
-	g.mcs = t125.NewMCSClient(g.x224)
+	g.mcs, g.ClientInfo = t125.NewMCSClient(g.x224)
 	g.Sec = sec.NewClient(g.mcs)
 	g.pdu = pdu.NewClient(g.Sec)
 

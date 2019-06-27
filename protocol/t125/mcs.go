@@ -253,7 +253,7 @@ type MCSClient struct {
 	userId            uint16
 }
 
-func NewMCSClient(t core.Transport) *MCSClient {
+func NewMCSClient(t core.Transport) (*MCSClient, *gcc.ClientCoreData) {
 	c := &MCSClient{
 		MCS:                NewMCS(t, SEND_DATA_INDICATION, SEND_DATA_REQUEST),
 		clientCoreData:     gcc.NewClientCoreData(),
@@ -261,7 +261,7 @@ func NewMCSClient(t core.Transport) *MCSClient {
 		clientSecurityData: gcc.NewClientSecurityData(),
 	}
 	c.transport.On("connect", c.connect)
-	return c
+	return c, c.clientCoreData
 }
 
 func (c *MCSClient) connect(selectedProtocol uint32) {
